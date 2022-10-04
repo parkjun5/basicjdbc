@@ -10,9 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MemberRepositoryV0Test {
 
+    MemberRepositoryV0 memberRepositoryV0 = new MemberRepositoryV0();
+
     @Test
     void saveTest() throws SQLException {
-        MemberRepositoryV0 memberRepositoryV0 = new MemberRepositoryV0();
         Member tester = new Member("TESTER3", 1000);
         Member save = memberRepositoryV0.save(tester);
         Assertions.assertThat(save).isEqualTo(tester);
