@@ -1,21 +1,27 @@
 package jdbc.test.basicjdbc.repository;
 
-import jdbc.test.basicjdbc.connection.DBConnectionUtil;
 import jdbc.test.basicjdbc.domain.Member;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.support.JdbcUtils;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.NoSuchElementException;
 
 @Slf4j
-public class MemberRepositoryV0 {
+public class MemberRepositoryV1 {
+
+    private final DataSource dataSource;
+
+    public MemberRepositoryV1(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     public Member save(Member member) throws SQLException {
         String sql = "insert into member(member_id, money) values (?, ?)";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
-
 
         try {
             conn = getConnection();
@@ -57,11 +63,10 @@ public class MemberRepositoryV0 {
         } finally {
             close(conn, pstmt, rs);
         }
-
     }
 
-    public int updateMember(String member_id) {
-        String sql = "update Member set money = 5000 where member_id = ?";
+    public int updateMember(String member_id, int money) {
+        String sql = "update Member set money = ? where member_id = ?";
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -69,14 +74,14 @@ public class MemberRepositoryV0 {
         try {
             conn = getConnection();
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, member_id);
+            pstmt.setInt(1 , money);
+            pstmt.setString(2, member_id);
             return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             close(conn, pstmt, null);
         }
-
     }
 
     public int deleteMember(String member_id) {
@@ -95,38 +100,18 @@ public class MemberRepositoryV0 {
         } finally {
             close(conn, pstmt, null);
         }
-
     }
 
     private void close(Connection conn, Statement pstmt, ResultSet rs) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException e) {
-                log.info("db close error", e);
-            }
-        }
-
-        if (pstmt != null) {
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                log.info("db close error", e);
-            }
-        }
-
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                log.info("db close error", e);
-            }
-        }
-
+        JdbcUtils.closeResultSet(rs);
+        JdbcUtils.closeStatement(pstmt);
+        JdbcUtils.closeConnection(conn);
     }
 
-    private Connection getConnection() {
-        return DBConnectionUtil.getConnection();
+    private Connection getConnection() throws SQLException {
+        Connection conn = dataSource.getConnection();
+        log.info("get connection = {}, class= {}", conn, conn.getClass());
+        return conn;
     }
 
 }
