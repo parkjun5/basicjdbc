@@ -2,7 +2,6 @@ package jdbc.test.basicjdbc.service;
 
 import com.zaxxer.hikari.HikariDataSource;
 import jdbc.test.basicjdbc.domain.Member;
-import jdbc.test.basicjdbc.repository.MemberRepositoryV1;
 import jdbc.test.basicjdbc.repository.MemberRepositoryV2;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
