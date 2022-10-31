@@ -1,22 +1,43 @@
 package jdbc.test.basicjdbc.exception.basic;
 
-import org.assertj.core.api.Assertions;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 
-public class UnCheckedAppTest {
+import static org.assertj.core.api.Assertions.*;
+
+@Slf4j
+class UnCheckedAppTest {
 
     @Test
     void unCheckedTest() {
         //given
         Controller controller = new Controller();
         //when + then
-        Assertions.assertThatThrownBy(controller::request)
+        assertThatThrownBy(controller::request)
                 .isInstanceOf(RunTimeSQLException.class);
     }
 
+    @Test
+    void printEx() {
+        //given
+        Controller co = new Controller();
+
+        //when
+        try {
+            co.request();
+        } catch (Exception e) {
+            log.info("ex", e);
+        }
+    }
+
     static class RunTimeSQLException extends RuntimeException {
+
+        public RunTimeSQLException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
         public RunTimeSQLException(Throwable cause) {
             super(cause);
         }
@@ -58,7 +79,7 @@ public class UnCheckedAppTest {
             try {
                 runSQL();
             } catch (SQLException e) {
-                throw new RunTimeSQLException(e);
+                throw new RunTimeSQLException("메시지 테스트",e);
             }
         }
 
